@@ -1,0 +1,142 @@
+import random
+
+class Veiculo:
+  def __init__(self):
+    self.placa = random.randint(1000000, 9999999) 
+    self.estacionado = False
+
+class Carro(Veiculo):   
+  def __init__(self):
+    super().__init__() 
+   
+  def Estacionar(self):
+      self.estacionado = True 
+    
+  def Sair_da_vaga(self):
+      self.estacionado = False
+
+class Moto(Veiculo):   
+  def __init__(self):
+    super().__init__()  
+
+  def Estacionar(self):
+      self.estacionado = True 
+    
+  def Sair_da_vaga(self):
+      self.estacionado = False
+
+class Vaga:
+  def __init__(self, identificador):
+    self.id = identificador
+    self.livre = True
+ 
+  def Ocupar(self):
+   self.livre = False
+
+  def Desocupar(self):
+    self.livre = True
+
+class Vaga_carro(Vaga):
+  def __init__(self):
+    super().__init__() 
+    self.tipo = 'carro'
+
+class Vaga_moto(Vaga):
+  def __init__(self):
+    super().__init__() 
+    self.tipo = 'moto'
+
+class Estacionamento(): 
+  def __init__(self):
+    self.carro_para_vaga = {}
+    self.moto_para_vaga ={}
+    self.total_vagas_livres_carro = 5
+    self.total_vagas_livres_moto = 5
+    self.inicio_vagas()
+
+  def inicio_vagas(self):
+    self.vagas_carro = {}
+    self.vagas_moto = {}
+
+    for i in range(self.total_vagas_livres_carro):
+      self.vagas_carro[i] = Vaga_carro(i)
+
+    for j in range(self.total_vagas_livres_moto):
+      self.vagas_moto[j] = Vaga_moto(j)  
+
+  def estacionar_carro(self, carro: Carro, vaga_carro: Vaga_carro):
+    if carro.estacionado == True:
+      raise ValueError(f'O carro {carro.placa} já está estacionado.')
+    
+    id_vaga_carro = self.buscar_vaga_carro()
+    if id_vaga_carro == None:
+      raise ValueError(f'O estacionamento está cheio para carros!')
+    else:
+      vaga_carro = self.vagas_carro[id_vaga_carro]
+      vaga_carro.ocupar(carro.placa)
+      carro.estacionar()
+      self.carro_para_vaga[carro.placa] = vaga_carro.id
+      self.total_vagas_livres_carro -=1
+
+    print(f'Carro {carro.placa} estacionado na vaga {vaga_carro.id}')
+
+    
+  def estacionar_moto(self, moto: Moto, vaga_moto: Vaga_moto):
+    if moto.estacionado == True:
+      raise ValueError(f'A moto {moto.placa} já está estacionada.')
+    
+    id_vaga_moto = self.buscar_vaga_moto()
+    if id_vaga_moto == None:
+      raise ValueError(f'O estacionamento está cheio para motos!')
+    else:
+      vaga_moto = self.vagas_moto[id_vaga_moto]
+      vaga_moto.ocupar(moto.placa)
+      moto.estacionar()
+      self.moto_para_vaga[moto.placa] = vaga_moto.id
+      self.total_vagas_livres_moto -=1
+
+    print(f'Moto {moto.placa} estacionado na vaga {vaga_moto.id}')
+
+  def buscar_vaga_carro(self, vaga_carro: Vaga_carro):        
+    if self.total_vagas_livres_carro > 0:
+      for identificador in self.vagas_carro.keys():
+        vaga_carro = self.vagas_carro[identificador]
+        if vaga_carro.livre == True:
+          return identificador
+
+  def buscar_vaga_moto(self, vaga_moto: Vaga_moto):        
+    if self.total_vagas_livres_moto > 0:
+      for identificador in self.vagas_moto.keys():
+        vaga_moto = self.vagas_moto[identificador]
+        if vaga_moto.livre == True:
+          return identificador
+
+
+  def remover_carro(self, carro: Carro):
+    id_vaga_carro = self.carro_para_vaga[carro.placa]
+    vaga_carro = self.vagas_carro[id_vaga_carro]
+    vaga_carro.desocupar()
+    carro.sair_da_vaga()
+    del self.carro_para_vaga[carro.placa]
+    self.total_vagas_livres_carro += 1
+    print(f'Carro {carro.placa} retirado da vaga {vaga_carro.id}')
+    return True
+
+  def remover_moto(self, moto: Moto):
+    id_vaga_moto = self.moto_para_vaga[moto.placa]
+    vaga_moto = self.vagas_moto[id_vaga_moto]
+    vaga_moto.desocupar()
+    moto.sair_da_vaga()
+    del self.moto_para_vaga[moto.placa]
+    self.total_vagas_livres_moto += 1
+    print(f'Carro {moto.placa} retirado da vaga {vaga_moto.id}')
+    return True
+
+   
+
+
+
+  
+
+
+  
